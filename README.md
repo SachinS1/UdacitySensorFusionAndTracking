@@ -1,3 +1,25 @@
+# SDCND : Sensor Fusion and Tracking Final Project
+
+## Part One
+For part one of the final project, an EKF was implemented to track a real-world target with lidar measurement input over time. `predict()`,`F()`, and `Q()` functions were implemented in `student/filter.py` by loading parameters from `misc\params.py` for the prediction step. For the update step, `update()`, `gamma()`, and `S()` functions were implemented in `student/filter.py`. Single target tracking results with the RMSE plot is shown below:
+
+![Single Tracking Result](https://github.com/SachinS1/UdacitySensorFusionAndTracking/blob/main/plots/final_part_1i.png)
+
+![RMSE Single Tracking](https://github.com/SachinS1/UdacitySensorFusionAndTracking/blob/main/plots/final_part_1ii.png)
+
+## Part Two
+For this part, a track management was implemented to initialize and delete tracks, and also to set a track state and a track score. Changes were made in `student/trackmanagement.py`  to initialize a track based in the input `meas` and the `manage_track()` function was implemented to decrease the track score for unassigned tracks and to delete tracks based on a low track score ot a high P value.
+
+Track states were also implemented as 'initialized', 'tentative', and 'confirmed' based on the track score. The resulting RMSE plot after completing step 2 is shown below:
+
+![Part 2 RMSE](https://github.com/SachinS1/UdacitySensorFusionAndTracking/blob/main/plots/final_part_2.png)
+
+## Part Three
+Simple nearest neighbour data association was implemented to associate measurements to tracks for part 3. Changes were made within `student/association.py` to create an association matrix based on the Mahalanobis distances for all tracks. A gating function was used to check if a measurement lies inside a track gate. The resulting RMSE plot after implementation of part 3 is shown below:
+
+![Part 3 RMSE](https://github.com/SachinS1/UdacitySensorFusionAndTracking/blob/main/plots/final_part_3png.png)
+
+## Part Four
 
 # SDCND : Sensor Fusion and Tracking
 This is the project for the second course in the  [Udacity Self-Driving Car Engineer Nanodegree Program](https://www.udacity.com/course/c-plus-plus-nanodegree--nd213) : Sensor Fusion and Tracking. 
