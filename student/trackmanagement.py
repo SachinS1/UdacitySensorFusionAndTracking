@@ -22,6 +22,7 @@ SCRIPT_DIR = os.path.dirname(os.path.realpath(os.path.join(os.getcwd(), os.path.
 sys.path.append(os.path.normpath(os.path.join(SCRIPT_DIR, PACKAGE_PARENT)))
 import misc.params as params 
 
+
 class Track:
     '''Track class with state, covariance, id, score'''
     def __init__(self, meas, id):
@@ -32,23 +33,26 @@ class Track:
         # TODO Step 2: initialization:
         # - replace fixed track initialization values by initialization of x and P based on 
         # unassigned measurement transformed from sensor to vehicle coordinates
+        x_sensor = np.ones((4,1))
+        x_sensor[0:3] = meas.z[0:3]
+        x_vehicle = meas.sensor.sens_to_veh * x_sensor
+        
+        self.x = np.zeros((6,1))
+        self.x[0:3] = x_vehicle[0:3]
+              
+        self.P = np.matrix(np.zeros((6,6)))
+        
+        self.P[0:3, 0:3] = M_rot * meas.R * np.transpose(M_rot)
+        self.P[3:6, 3:6] = np.matrix([[params.sigma_p44**2, 0, 0],
+                        [0, params.sigma_p55**2, 0],
+                        [0, 0, params.sigma_p66**2]])
+
         # - initialize track state and track score with appropriate values
         ############
 
-        self.x = np.matrix([[49.53980697],
-                        [ 3.41006279],
-                        [ 0.91790581],
-                        [ 0.        ],
-                        [ 0.        ],
-                        [ 0.        ]])
-        self.P = np.matrix([[9.0e-02, 0.0e+00, 0.0e+00, 0.0e+00, 0.0e+00, 0.0e+00],
-                        [0.0e+00, 9.0e-02, 0.0e+00, 0.0e+00, 0.0e+00, 0.0e+00],
-                        [0.0e+00, 0.0e+00, 6.4e-03, 0.0e+00, 0.0e+00, 0.0e+00],
-                        [0.0e+00, 0.0e+00, 0.0e+00, 2.5e+03, 0.0e+00, 0.0e+00],
-                        [0.0e+00, 0.0e+00, 0.0e+00, 0.0e+00, 2.5e+03, 0.0e+00],
-                        [0.0e+00, 0.0e+00, 0.0e+00, 0.0e+00, 0.0e+00, 2.5e+01]])
-        self.state = 'confirmed'
-        self.score = 0
+
+        self.state = 'initialized'
+        self.score = 1./params.window
         
         ############
         # END student code
@@ -100,6 +104,8 @@ class Trackmanagement:
         # feel free to define your own parameters)
         ############
         
+        threshold_for_non_confirmed = 0.13
+        
         # decrease score for unassigned tracks
         for i in unassigned_tracks:
             track = self.track_list[i]
@@ -107,10 +113,21 @@ class Trackmanagement:
             if meas_list: # if not empty
                 if meas_list[0].sensor.in_fov(track.x):
                     # your code goes here
-                    pass 
+                     track.score -= 1./params.window 
+                        
 
-        # delete old tracks   
-
+        for track in self.track_list:
+            if (track.state ==  'initialized') or (track.state == 'tentative'):
+                if track.score <= threshold_for_non_confirmed:
+                    self.delete_track(track)
+                elif (track.P[0,0] > params.max_P) or (track.P[1,1]>params.max_P):
+                    self.delete_track(track)
+            elif (track.state == 'confirmed'):
+                if track.score <= params.delete_threshold:
+                    self.delete_track(track)
+                elif (track.P[0,0] > params.max_P) or (track.P[1,1]>params.max_P):
+                    self.delete_track(track)
+            
         ############
         # END student code
         ############ 
@@ -139,8 +156,13 @@ class Trackmanagement:
         # - increase track score
         # - set track state to 'tentative' or 'confirmed'
         ############
-
-        pass
+        track.score += 1./params.window
+        
+        if track.score >= params.confirmed_threshold:
+            track.state = 'confirmed'
+        else:
+            track.state = 'tentative'
+        
         
         ############
         # END student code
