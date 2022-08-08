@@ -20,6 +20,28 @@ Simple nearest neighbour data association was implemented to associate measureme
 ![Part 3 RMSE](https://github.com/SachinS1/UdacitySensorFusionAndTracking/blob/main/plots/final_part_3png.png)
 
 ## Part Four
+A non-linear camera measurement model was implemented in part 4 to complete the sensor fusion module for camera-lidar fusion. Changes were made within `student/measurements.py` to implement the camera measurement model to transform position estimate from vehicle to camera coordinates and to project from camera to image coordinates. Camera measurement objects were initialized and the overall sensor fusion model was implemented. The resulting RMSE plot and overall tracking results  are shown below:
+
+![Final RMSE](https://github.com/SachinS1/UdacitySensorFusionAndTracking/blob/main/plots/final_part_4.png)
+
+![Final Tracking Result](https://github.com/SachinS1/UdacitySensorFusionAndTracking/blob/main/my_tracking_results.gif)
+
+## Which part of the project was most difficult for you to complete, and why?
+For me, the most difficult part to complete was the implementation of camera measurement model. Compared to a linear measurement model for the LiDAR, the camera measurement model was a little bit different and involved co-ordinate transforms from vehicle to sensor and sensor to pixels. However, the given exercises in the lecture series helped me really well while finishing the final project.
+
+## Do you see any benefits in camera-lidar fusion compared to lidar-only tracking (in theory and in your concrete results)?
+In theory, camera and lidar fusion has many benefits compared to lidar-only tracking. While we lack depth information from camera output, but camera easily outperforms in object classification. There might be false positives in lidar detections due to the high reflectivity of an object. The outputs of these two sensors, each with their own advantages can be fused for a more robust detection and tracking model for autonomous vehicles.
+
+In my case, camera-lidar fusion yielded optimal results as expected. The overall RMSE for detected tracks decreased and most importantly, there were no confirmed ghost trachs throughout the selected sequence. 
+
+## Which challenges will a sensor fusion system face in real-life scenarios? Did you see any of these challenges in the project?
+In this project, we only processed data from front facing lidar and camera from the Waymo vehicle. In reality, we need to fuse informations from multiple sensors for an accurate representation of a driving environment. While fusing information through different sensors, sensor-specific measurement models with appropriate error covariance matrices should be set up. We also need to pay attention to co-ordinate transforms from vehicle to sensor co-ordinates or vice-versa. 
+
+## Can you think of ways to improve your tracking results in the future?
+To improve tracking results, we could add information from other sensors as well. As outlined in the course, we could use more sophisticated approaches like GNN and PDA for track association compared to SNN approach used for this project.
+
+We could also implement a nonlinear motion model which could model the real life scenarios better. The process and measurement noise covariance matrices can be finetuned with the experimentation to reduce the error between predictions and measurements. 
+
 
 # SDCND : Sensor Fusion and Tracking
 This is the project for the second course in the  [Udacity Self-Driving Car Engineer Nanodegree Program](https://www.udacity.com/course/c-plus-plus-nanodegree--nd213) : Sensor Fusion and Tracking. 
